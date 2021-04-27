@@ -7,6 +7,44 @@ import (
 	"github.com/NotFlexRestAPI/models"
 )
 
+// Elangel
+func TambahFilm(w http.ResponseWriter, r *http.Request) {
+	var response models.Response
+	if !connect() {
+		ResponseManager(&response, 500, " Database Server Not Responding")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		ResponseManager(&response, 400, " Error when parsing form")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	judul := r.Form.Get("judul")
+	sinopsis := r.Form.Get("sinopsis")
+	pemainUtama := r.Form.Get("pemainutama")
+	genre := r.Form.Get("genre")
+	sutradara := r.Form.Get("sutradara")
+	tahunRilis := r.Form.Get("tahunrilis")
+
+	query := "INSERT INTO film(judul, sinopsis, pemainutama, genre, sutradara, tahunrilis) VALUES(?,?,?,?,?,?)"
+	_, errQuery := DBConnection.Exec(query, judul, sinopsis, pemainUtama, genre, sutradara, tahunRilis)
+
+	if errQuery != nil {
+		ResponseManager(&response, 500, "Error Insert New Film")
+	} else {
+		ResponseManager(&response, 200, "Success Insert New Film")
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
 // femi
 func CariFilm(w http.ResponseWriter, r *http.Request) {
 	if !connect() {

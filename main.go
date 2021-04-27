@@ -17,16 +17,23 @@ func main() {
 	router.HandleFunc("/login", controllers.UserLogin).Methods("GET")
 	router.HandleFunc("/logout", controllers.Logout).Methods("GET")
 	router.HandleFunc("/registrasi", controllers.MemberRegistration).Methods("POST")
-	router.HandleFunc("/users/update", controllers.UpdateProfile).Methods("POST")
 
 	router.HandleFunc("/registrasi", controllers.CariFilm).Methods("POST")
 	router.HandleFunc("/registrasi", controllers.Menonton).Methods("POST")
 	router.HandleFunc("/registrasi", controllers.TambahHistory).Methods("POST")
 
 	router.HandleFunc("/administrator", controllers.CariMemberBerdasarkanEmail).Methods("GET")
+	router.HandleFunc("/administrator/tambahFilm", controllers.TambahFilm).Methods("POST")
+	router.HandleFunc("/administrator/tambahKoleksi", controllers.TambahKoleksi).Methods("POST")
+	router.HandleFunc("/administrator/tambahFilmKeKoleksi", controllers.TambahFilmKeKoleksi).Methods("POST")
+	router.HandleFunc("/administrator/lihatDetailKoleksi", controllers.LihatDetailKoleksi).Methods("GET")
 	//router.HandleFunc("/administrator", controllers.UbahDataFilm).Methods("PUT")
 	//router.HandleFunc("/administrator", controllers.CariDataFilmBerdasarkanJudul).Methods("GET")
 	router.HandleFunc("/administrator", controllers.CariDataFilmBerdasarkanId).Methods("GET")
+
+	router.HandleFunc("/member/lihatHistoryFilm", controllers.LihatHistoryFilm).Methods("GET")
+	router.HandleFunc("/member/updateProfile", controllers.UpdateProfile).Methods("PUT")
+	router.HandleFunc("/member/berhentiBerlangganan/{idUser}", controllers.BerhentiBerlangganan).Methods("DELETE")
 
 	router.HandleFunc("/cari", controllers.CariDataFilmBerdasarkanId).Methods("POST")
 	/*

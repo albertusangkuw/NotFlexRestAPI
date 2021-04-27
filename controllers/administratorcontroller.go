@@ -49,49 +49,6 @@ func CariMemberBerdasarkanEmail(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// Elangel
-func TambahKoleksiFilm(w http.ResponseWriter, r *http.Request) { //insert film dan koleksi
-	if !connect() {
-		var response models.Response
-		ResponseManager(&response, 500, " Database Server Not Responding")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		var response models.Response
-		ResponseManager(&response, 400, " Error when parsing form")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	judul := r.Form.Get("judul")
-	tahunRilis := r.Form.Get("tahunrilis")
-	genre := r.Form.Get("genre")
-	sutradara := r.Form.Get("sutradara")
-	pemainUtama := r.Form.Get("pemainutama")
-	sinopsis := r.Form.Get("sinopsis")
-	namaKoleksi := r.Form.Get("namakoleksi")
-
-	query := "INSERT INTO film(judul, tahunrilis, genre, sutradara, pemainutama, sinopsis) VALUES(?,?,?,?,?,?)"
-	_, errQuery := DBConnection.Exec(query, judul, tahunRilis, genre, sutradara, pemainUtama, sinopsis)
-
-	query = "INSERT INTO koleksi(namakoleksi) VALUES(?)"
-	_, errQuery = DBConnection.Exec(query, namaKoleksi)
-	var response models.Response
-	if errQuery != nil {
-		ResponseManager(&response, 500, "Error Insert New Film")
-	} else {
-		ResponseManager(&response, 200, "Success Insert New Film")
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
 // //christian
 /*
 func UbahDataFilm(w http.ResponseWriter, r *http.Request) {
