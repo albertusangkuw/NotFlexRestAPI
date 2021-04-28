@@ -2,13 +2,20 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/NotFlexRestAPI/models"
+	"github.com/gorilla/mux"
 )
 
-//christian
+// Christian
+// cari member berfungsi mencari data member berdasarkan email
+// Method : GET
+// Parameter : Params
+// Nilai Parameter Wajib : Email
+//
 func CariMemberBerdasarkanEmail(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
@@ -22,22 +29,26 @@ func CariMemberBerdasarkanEmail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-
+	var response models.MemberResponse
 	email := r.URL.Query()["email"]
-	query := "SELECT u.iduser, u.email, u.namalengkap, u.password, u.tipe, m.jeniskelamin, m.asalnegara, m.status, m.tanggallahir FROM user u JOIN member m where u.email = " + email[0] + " "
+	query := "SELECT u.iduser, u.email, u.namalengkap, u.password, u.tipe, m.jeniskelamin, m.asalnegara, m.status, m.tanggallahir FROM user u JOIN member m where u.email = '" + email[0] + "' "
 	resultSet, errQuery := DBConnection.Query(query)
-
+	if errQuery != nil {
+		ResponseManager(&response.Response, 500, errQuery.Error())
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
 	var member models.Member
 	var members []models.Member
 	for resultSet.Next() {
-		if err := resultSet.Scan(&member.IDUser, &member.Email, &member.NamaLengkap, &member.Password, &member.JenisKelamin, &member.AsalNegara, &member.Status, &member.TanggalLahir); err != nil {
+		if err := resultSet.Scan(&member.IDUser, &member.Email, &member.NamaLengkap, &member.Password, &member.Tipe, &member.JenisKelamin, &member.AsalNegara, &member.Status, &member.TanggalLahir); err != nil {
 			log.Print(err.Error())
 		} else {
 			members = append(members, member)
 		}
 	}
 
-	var response models.MemberResponse
 	if errQuery != nil {
 		ResponseManager(&response.Response, 500, errQuery.Error())
 	} else {
@@ -49,9 +60,12 @@ func CariMemberBerdasarkanEmail(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// //christian
-/*
-func UbahDataFilm(w http.ResponseWriter, r *http.Request) {
+// Femi
+// Blokir member berfungsi untuk melakukan suspend terhadap user
+// Method : GET
+// Parameter :Path Param
+// Nilai Parameter Wajib : iduser
+func BlokirMember(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -62,108 +76,49 @@ func UbahDataFilm(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
+		var response models.Response
+		ResponseManager(&response, 400, " Error when parsing form")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	judul := r.URL.Query()["judul"]
-	_, errQuery := db.Exec("UPDATE film SET judul=?, sinopsis=?, pemainutama=?, genre=?, sutradara=?, tahunrilis=? FROM film WHERE id =?",
-		judul,
-		sinopsis,
-		pemainutama,
-		genre,
-		sutradara,
-		tahunrilis,
-		id,
-	)
+	vars := mux.Vars(r)
+	iduser := vars["iduser"]
+	query := "UPDATE member SET status = 0 WHERE iduser = ?"
 
-	var response models.FilmResponse
+	if len(iduser) == 0 {
+		var response models.Response
+		ResponseManager(&response, 400, " Iduser required")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	var response models.UserResponse
+	resultSet, errQuery := DBConnection.Query(query, iduser)
+	var User models.User
+	var Users []models.User
+
 	if errQuery != nil {
 		ResponseManager(&response.Response, 500, errQuery.Error())
 	} else {
-		ResponseManager(&response.Response, 200, "Success GET User")
-		response.Data = films
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-	return
-}
+		for resultSet.Next() {
+			if errors := resultSet.Scan(); errors != nil {
 
-//christian
-func CariDataFilmBerdasarkanJudul(w http.ResponseWriter, r *http.Request) {
-	if !connect() {
-		var response models.Response
-		ResponseManager(&response, 500, " Database Server Not Responding")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
-
-	judul := r.URL.Query()["judul"]
-	query := "SELECT judul, sinopsis, pemainutama, genre, sutradara, tahunrilis FROM film where judul = " + judul[0] + " "
-	resultSet, errQuery := DBConnection.Query(query)
-	var film models.Film
-	var films []models.Film
-	for resultSet.Next() {
-		if err := resultSet.Scan(&film.IDFilm, &film.Judul, &film.Sinopsis, &film.PemainUtama, &film.Genre, &film.Sutradara, &film.TahunRilis); err != nil {
-			log.Print(err.Error())
+			} else {
+				Users = append(Users, User)
+			}
+		}
+		if len(Users) > 0 {
+			response.Data = Users
+			ResponseManager(&response.Response, 200, " ")
+			fmt.Println("Id User ada")
 		} else {
-			films = append(films, film)
+			ResponseManager(&response.Response, 400, " ")
 		}
 	}
-
-	var response models.FilmResponse
-	if errQuery != nil {
-		ResponseManager(&response.Response, 500, errQuery.Error())
-	} else {
-		ResponseManager(&response.Response, 200, "Success GET User")
-		response.Data = films
-	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
-	return
-}
-*/
-//christian
-func CariDataFilmBerdasarkanId(w http.ResponseWriter, r *http.Request) {
-	if !connect() {
-		var response models.Response
-		ResponseManager(&response, 500, " Database Server Not Responding")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
 
-	err := r.ParseForm()
-	if err != nil {
-		return
-	}
-
-	idFilm := r.URL.Query()["idFilm"]
-	query := "SELECT judul, sinopsis, pemainutama, genre, sutradara, tahunrilis FROM film where judul = " + idFilm[0] + " "
-	resultSet, errQuery := DBConnection.Query(query)
-	var film models.Film
-	var films []models.Film
-	for resultSet.Next() {
-		if err := resultSet.Scan(&film.IDFilm, &film.Judul, &film.Sinopsis, &film.PemainUtama, &film.Genre, &film.Sutradara, &film.TahunRilis); err != nil {
-			log.Print(err.Error())
-		} else {
-			films = append(films, film)
-		}
-	}
-
-	var response models.FilmResponse
-	if errQuery != nil {
-		ResponseManager(&response.Response, 500, errQuery.Error())
-	} else {
-		ResponseManager(&response.Response, 200, "Success GET User")
-		response.Data = films
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-	return
 }

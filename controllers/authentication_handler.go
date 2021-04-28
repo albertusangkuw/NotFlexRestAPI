@@ -1,6 +1,5 @@
 package controllers
 
-/*
 import (
 	"encoding/json"
 	"fmt"
@@ -8,10 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	model "github.com/NotFlexRestAPI/model"
+	"github.com/NotFlexRestAPI/models"
 	"github.com/dgrijalva/jwt-go"
 )
-
 
 var jwtKey = []byte(RandStringBytesRmndr(128))
 var tokenName = "token"
@@ -29,6 +27,7 @@ func RandStringBytesRmndr(n int) string {
 	for i := range b {
 		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
 	}
+	println("JWT Key :" + string(b))
 	return string(b)
 }
 
@@ -58,7 +57,6 @@ func generateToken(w http.ResponseWriter, id string, name string, userType int) 
 		Secure:   false,
 		HttpOnly: true,
 	})
-
 }
 
 func resetUserToken(w http.ResponseWriter) {
@@ -73,11 +71,17 @@ func resetUserToken(w http.ResponseWriter) {
 
 func Authenticate(next http.HandlerFunc, accessType int) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		isValidToken := validateUserToken(w, r, accessType)
-		if !isValidToken {
-			var response model.UserResponse
+		isValidToken, id := validateUserToken(w, r, accessType)
+		if id == "" {
+			var response models.Response
 			response.Status = 401
 			response.Message = "Unauthorized Access"
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		} else if !isValidToken {
+			var response models.Response
+			response.Status = 403
+			response.Message = "Forbidden Access"
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 		} else {
@@ -86,16 +90,16 @@ func Authenticate(next http.HandlerFunc, accessType int) http.HandlerFunc {
 	})
 }
 
-func validateUserToken(w http.ResponseWriter, r *http.Request, accessType int) bool {
+func validateUserToken(w http.ResponseWriter, r *http.Request, accessType int) (bool, string) {
 	isAccessTokenValid, id, _, userType := validateUserTokenFromCookies(r)
 	if isAccessTokenValid {
 		isUserValid := userType == accessType
 		if isUserValid {
 			fmt.Print("ID User trigger : ", id)
-			return true
+			return true, id
 		}
 	}
-	return false
+	return false, id
 }
 
 func validateUserTokenFromCookies(r *http.Request) (bool, string, string, int) {
@@ -112,4 +116,3 @@ func validateUserTokenFromCookies(r *http.Request) (bool, string, string, int) {
 	}
 	return false, "", "", -1
 }
-*/

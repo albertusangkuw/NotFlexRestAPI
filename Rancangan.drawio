@@ -1,11 +1,11 @@
 <mxfile>
     <diagram id="NXoUtkJ71gg7D1fnaNGt" name="Class Diagram">
-        <mxGraphModel dx="423" dy="1675" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1477" dy="1628" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="-B72JW4S_CNFPvoDVsB8-190" value="Model" style="shape=folder;fontStyle=1;tabWidth=110;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;labelInHeader=1;container=1;collapsible=0;recursiveResize=0;" parent="1" vertex="1">
-                    <mxGeometry x="10" y="-1090" width="1650" height="1330" as="geometry"/>
+                    <mxGeometry x="10" y="-1090" width="1650" height="1410" as="geometry"/>
                 </mxCell>
                 <mxCell id="qkwveqBN_5tGitOWMpCw-6" value="&lt;&lt;entity&gt;&gt;&#10;Film" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=40;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
                     <mxGeometry x="500" y="-90" width="170" height="272" as="geometry"/>
@@ -61,7 +61,7 @@
                 <mxCell id="184" value="+ Berlangganan(idUser, jenisLangganan, nomorKartuKredit, bulanTahunKartuKredit,) " style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="xPRmOCERpgeF5Jm3187p-31" vertex="1">
                     <mxGeometry y="230" width="570" height="36" as="geometry"/>
                 </mxCell>
-                <mxCell id="j8zux52S4JUQsAwn6EQ1-189" value="+ berhentiBerlangganan(idUser) " style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="xPRmOCERpgeF5Jm3187p-31">
+                <mxCell id="j8zux52S4JUQsAwn6EQ1-189" value="+ berhentiBerlangganan(idUser) " style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="xPRmOCERpgeF5Jm3187p-31" vertex="1">
                     <mxGeometry y="266" width="570" height="36" as="geometry"/>
                 </mxCell>
                 <mxCell id="63" value="&lt;&lt;entity&gt;&gt;&#10;User" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=39;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
@@ -379,7 +379,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="In5JC-tp4L6Gls2-BrtL" name="Skema Basis Data">
-        <mxGraphModel dx="189" dy="575" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1772" dy="860" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="C9hFgudLBUilhqlsTBZa-0"/>
                 <mxCell id="C9hFgudLBUilhqlsTBZa-1" parent="C9hFgudLBUilhqlsTBZa-0"/>
