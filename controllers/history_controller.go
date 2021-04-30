@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/NotFlexRestAPI/models"
 	"github.com/gorilla/mux"
@@ -12,9 +13,9 @@ import (
 // Femi
 // Tambah history berfungsi untuk menambah history setelah member selesai menonton
 // Method : POST
-// Parameter : Path param
+// Parameter : -
 // Nilai Parameter Wajib : iduser, tanggalakses, idfilm
-func TambahHistory(w http.ResponseWriter, r *http.Request) {
+func AddHistory(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -32,8 +33,8 @@ func TambahHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	iduser := r.Form.Get("iduser")
-	tanggalakses := r.Form.Get("tanggalakses")
+	_, iduser, _, _ := validateUserTokenFromCookies(r)
+	tanggalakses := time.Now()
 	vars := mux.Vars(r)
 	idfilm := vars["idfilm"]
 
@@ -41,18 +42,18 @@ func TambahHistory(w http.ResponseWriter, r *http.Request) {
 	_, errQuery := DBConnection.Exec(query, iduser, tanggalakses, idfilm)
 
 	if errQuery != nil {
-		println("Tidak berharil di insert")
+		println("Tidak berhasil di insert")
 	} else {
-		println("Berharil di insert")
+		println("Berhasil di insert")
 	}
 }
 
 // Elangel
-// LihatHistoryFilm berfungsi untuk melihat seluruh data history pada dataase
+// Getungsi untuk melihat seluruh data history pada dataase
 // Method : GET
 // Parameter : Query Params
 // Nilai Parameter Wajib : iduser
-func LihatHistoryFilm(w http.ResponseWriter, r *http.Request) {
+func GetHistoryFilm(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -69,16 +70,30 @@ func LihatHistoryFilm(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-
-	idUser := r.URL.Query()["iduser"]
-	query := "SELECT h.idhistory, f.idfilm, f.judul, f.sinopsis, f.genre, h.tanggalakses FROM history h JOIN film f ON h.idfilm = f.idfilm WHERE h.iduser = " + idUser[0]
-	resultSet, errQuery := DBConnection.Query(query)
+	vars := mux.Vars(r)
+	idUser := vars["iduser"]
+	if len(idUser) == 0 {
+		var response models.Response
+		ResponseManager(&response, 400, " Error when parsing form")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+	query := "SELECT h.idhistory, f.idfilm, f.judul, f.sinopsis, f.genre, h.tanggalakses FROM history h JOIN film f ON h.idfilm = f.idfilm WHERE h.iduser =? "
+	resultSet, errQuery := DBConnection.Query(query, idUser)
 
 	var history models.History
 	var film models.Film
 	var films []models.Film
+	if errQuery != nil {
+		var response models.Response
+		ResponseManager(&response, 500, errQuery.Error())
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
 	for resultSet.Next() {
-		if err := resultSet.Scan(&history.IdHistory, &film.IDFilm, &film.Judul, &film.Sinopsis, &film.Genre, &history.TanggalAkses); err != nil {
+		if err := resultSet.Scan(&history.IdHistory, &film.IDFilm, &film.Title, &film.Sinopsis, &film.Genre, &history.DateAccess); err != nil {
 			log.Println(err.Error())
 		} else {
 			films = append(films, film)

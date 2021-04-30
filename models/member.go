@@ -4,9 +4,9 @@ import "time"
 
 type Member struct {
 	User
-	TanggalLahir time.Time `form:"TanggalLahir" json:"TanggalLahir"`
-	JenisKelamin string    `form:"JenisKelamin" json:"JenisKelamin"`
-	AsalNegara   string    `form:"AsalNegara" json:"AsalNegara"`
+	DateOfBirth time.Time `form:"DateOfBirth" json:"DateOfBirth"`
+	Gender string    `form:"Gender" json:"Gender"`
+	OriginCountry   string    `form:"OriginCountry" json:"OriginCountry"`
 	Status       bool      `form:"Password" json:"Password"`
 }
 

@@ -94,6 +94,9 @@ func validateUserToken(w http.ResponseWriter, r *http.Request, accessType int) (
 	isAccessTokenValid, id, _, userType := validateUserTokenFromCookies(r)
 	if isAccessTokenValid {
 		isUserValid := userType == accessType
+		if accessType == 0 {
+			isUserValid = true
+		}
 		if isUserValid {
 			fmt.Print("ID User trigger : ", id)
 			return true, id

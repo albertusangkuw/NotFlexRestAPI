@@ -4,7 +4,7 @@ import "time"
 
 type History struct {
 	IdHistory    int       `form:"IdHistory" json:"IdHistory"`
-	TanggalAkses time.Time `form:"TanggalAkses" json:"TanggalAkses"`
+	DateAccess time.Time `form:"DateAccess" json:"DateAccess"`
 }
 
 type HistoryResponse struct {

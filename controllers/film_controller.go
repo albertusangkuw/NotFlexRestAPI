@@ -10,11 +10,11 @@ import (
 )
 
 // Elangel
-// TambahFilm berfungsi untuk melakukan insert data film baru ke dalam database
+// AddFilm berfungsi untuk melakukan insert data film baru ke dalam database
 // Method : POST
 // Parameter : Body  x-www-form-urlencoded
 // Nilai Parameter Wajib : judul
-func TambahFilm(w http.ResponseWriter, r *http.Request) {
+func AddFilm(w http.ResponseWriter, r *http.Request) {
 	var response models.Response
 	if !connect() {
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -43,7 +43,7 @@ func TambahFilm(w http.ResponseWriter, r *http.Request) {
 		_, errQuery := DBConnection.Exec(query, judul, sinopsis, pemainUtama, genre, sutradara, tahunRilis)
 
 		if errQuery != nil {
-			ResponseManager(&response, 500, "Error Insert New Film")
+			ResponseManager(&response, 500, "Error Insert New Film"+errQuery.Error())
 		} else {
 			ResponseManager(&response, 200, "Success Insert New Film")
 		}
@@ -64,7 +64,8 @@ func TambahFilm(w http.ResponseWriter, r *http.Request) {
 // Method : GET
 // Parameter : Query params
 // Nilai Parameter Wajib : -
-func CariFilm(w http.ResponseWriter, r *http.Request) {
+// Nilai Parameter Optional : judul, sinopsis, pemainutama, genre, sutradara
+func SearchCollectionFilm(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -96,7 +97,7 @@ func CariFilm(w http.ResponseWriter, r *http.Request) {
 		ResponseManager(&response.Response, 500, errQuery.Error())
 	} else {
 		for resultSet.Next() {
-			if errors := resultSet.Scan(&Film.Judul, &Film.Sinopsis, &Film.PemainUtama, &Film.Genre, &Film.Sutradara, &Film.TahunRilis); errors != nil {
+			if errors := resultSet.Scan(&Film.Title, &Film.Sinopsis, &Film.MainCast, &Film.Genre, &Film.Director, &Film.ReleaseYear); errors != nil {
 
 			} else {
 				Films = append(Films, Film)
@@ -116,10 +117,10 @@ func CariFilm(w http.ResponseWriter, r *http.Request) {
 // Christian
 // cari data film berfungsi mencari data film berdasarkan judul
 // Method : GET
-// Parameter : para
+// Parameter : params
 // Nilai Parameter Wajib : judul
 //
-func CariDataFilmBerdasarkanJudul(w http.ResponseWriter, r *http.Request) {
+func SearchFilmDataBasedTitle(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -139,7 +140,7 @@ func CariDataFilmBerdasarkanJudul(w http.ResponseWriter, r *http.Request) {
 	var film models.Film
 	var films []models.Film
 	for resultSet.Next() {
-		if err := resultSet.Scan(&film.Judul, &film.Sinopsis, &film.PemainUtama, &film.Genre, &film.Sutradara, &film.TahunRilis); err != nil {
+		if err := resultSet.Scan(&film.Title, &film.Sinopsis, &film.MainCast, &film.Genre, &film.Director, &film.ReleaseYear); err != nil {
 			log.Print(err.Error())
 		} else {
 			films = append(films, film)
@@ -164,7 +165,7 @@ func CariDataFilmBerdasarkanJudul(w http.ResponseWriter, r *http.Request) {
 // Parameter : Params
 // Nilai Parameter Wajib : ID film
 //
-func CariDataFilmBerdasarkanId(w http.ResponseWriter, r *http.Request) {
+func SearchFilmDataBasedId(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -192,7 +193,7 @@ func CariDataFilmBerdasarkanId(w http.ResponseWriter, r *http.Request) {
 	var film models.Film
 	var films []models.Film
 	for resultSet.Next() {
-		if err := resultSet.Scan(&film.Judul, &film.Sinopsis, &film.PemainUtama, &film.Genre, &film.Sutradara, &film.TahunRilis); err != nil {
+		if err := resultSet.Scan(&film.Title, &film.Sinopsis, &film.MainCast, &film.Genre, &film.Director, &film.ReleaseYear); err != nil {
 			log.Print(err.Error())
 		} else {
 			films = append(films, film)
@@ -258,12 +259,12 @@ func UpdateDataFilm(w http.ResponseWriter, r *http.Request) {
 }
 
 // femi
-// Menonton berfungsi berfungsi untuk menonton, dengan memasukkan idfilm, setelah menonton(sudah memasukkan id film)
+// Watching berfungsi berfungsi untuk Watching, dengan memasukkan idfilm, setelah Watching(sudah memasukkan id film)
 // nantinya akan tercatat di history
-// Method : POST
+// Method : GET
 // Parameter : Path params
 // Nilai Parameter Wajib : idfilm
-func Menonton(w http.ResponseWriter, r *http.Request) {
+func Watching(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")
@@ -303,16 +304,17 @@ func Menonton(w http.ResponseWriter, r *http.Request) {
 		ResponseManager(&response.Response, 500, errQuery.Error())
 	} else {
 		for resultSet.Next() {
-			if errors := resultSet.Scan(&Film.Judul, &Film.Sinopsis, &Film.PemainUtama, &Film.Genre, &Film.Sutradara, &Film.TahunRilis); errors != nil {
-
+			if errors := resultSet.Scan(&Film.Title, &Film.Sinopsis, &Film.MainCast, &Film.Genre, &Film.Director, &Film.ReleaseYear); errors != nil {
+				println(errors.Error())
 			} else {
+				//	Film.IDFilm, _= strconv.ParseUint(strconv.Atoi(idfilm))
 				Films = append(Films, Film)
 			}
 		}
 		if len(Films) > 0 {
 			response.Data = Films
-			ResponseManager(&response.Response, 200, " ")
-			TambahHistory(w, r)
+			ResponseManager(&response.Response, 200, "")
+			AddHistory(w, r)
 		} else {
 			ResponseManager(&response.Response, 400, errQuery.Error())
 		}

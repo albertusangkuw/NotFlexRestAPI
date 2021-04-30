@@ -6,74 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
 	"github.com/NotFlexRestAPI/models"
 )
-
-func contohControllerHandler(w http.ResponseWriter, r *http.Request) {
-	// Melakukan pengecheckan ke server database
-	if !connect() {
-		var response models.Response
-		ResponseManager(&response, 500, " Database Server Not Responding")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	//Untuk Dapat value dari URL contoh http://host/users/uh972y7r2rh  => http://host/users/{iduser}
-	err := r.ParseForm()
-	if err != nil {
-		var response models.Response
-		ResponseManager(&response, 400, " Error when parsing form")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-	vars := mux.Vars(r)
-	iduser := vars["iduser"]
-	println(iduser)
-
-	//Untuk Dapat value dari GET  contoh http://host/users?name=Budi  => http://host/users
-	testData := r.URL.Query()["name"]
-	println(testData[0])
-
-	//Untuk Dapat value dari POST  contoh http://host/users/new   {BODY x-www-form-url:  name="Ani"}    => http://host/users
-	newName := r.Form.Get("name")
-	println(newName)
-
-	// Untuk Select atau mendapatkan data dari DB gunakan  Query
-	query := "SELECT iduser,username,email FROM user"
-	resultSet, _ := DBConnection.Query(query)
-	for resultSet.Next() {
-		//lakukan sesuatu dengan data
-	}
-
-	// Untuk Delete, Update, Insert gunakan Exec
-	query = "INSERT INTO song_like(iduser,idsong) VALUES(?,?)"
-	data1 := "1"
-	data2 := "Indonesia Raya"
-	_, errQuery := DBConnection.Exec(query, data1, data2)
-
-	//Untuk menambahkan data diresponse yang sudah dibuat di model
-	var response models.UserResponse
-	ResponseManager(&response.Response, 200, "Success GET User")
-	response.Data = nil
-
-	//Mengatasi error
-	if errQuery != nil {
-		ResponseManager(&response.Response, 500, errQuery.Error())
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	// Custom Generate SQL
-	filterBY, valuesList := GenerateSQLWhere(r, []string{"id", "title"}, "OR", "POST")
-	// hasil filterBY (string) = id=? OR title=?
-	query += "WHERE " + filterBY
-	resultSet, _ = DBConnection.Query(query, valuesList)
-}
 
 // Albertus
 // Member registrasi berfungsi
@@ -236,11 +170,11 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 // Albertus
 // Member Logout
 // Method : Get
-// Parameter :
-// Nilai Parameter Wajib : email, password
+// Parameter :-
+// Nilai Parameter Wajib : -
 //
 func Logout(w http.ResponseWriter, r *http.Request) {
-	//resetUserToken(w)
+	resetUserToken(w)
 	var response models.Response
 	ResponseManager(&response, 200, "Success Logout")
 	w.Header().Set("Content-Type", "application/json")
