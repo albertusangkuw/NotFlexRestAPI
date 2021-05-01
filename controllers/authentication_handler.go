@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -11,24 +10,14 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtKey = []byte(RandStringBytesRmndr(128))
-var tokenName = "token"
+var jwtKey = []byte("oJnNPGsiuzytMOJPatwtPilfsfykSBGplhxtxVSGpqaJaBRgAvzLXqzRrrUIYvaIujDpHYjxeUBrVfdwUzWHRihFDPRHBMuEWmaNvhHLITWJcJKzJsRPeJbpTqWPUlWA")
+var tokenName = "Token-NotRestAPI"
 
 type Claims struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	UserType int    `json:"usertype"`
 	jwt.StandardClaims
-}
-
-func RandStringBytesRmndr(n int) string {
-	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
-	}
-	println("JWT Key :" + string(b))
-	return string(b)
 }
 
 func generateToken(w http.ResponseWriter, id string, name string, userType int) {

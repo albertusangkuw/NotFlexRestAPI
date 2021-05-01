@@ -33,7 +33,7 @@ func AddHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, iduser, _, _ := validateUserTokenFromCookies(r)
+	_, iduser, _, _ := validateUserTokenFromCookies(r) //checkiduser dari cookie
 	tanggalakses := time.Now()
 	vars := mux.Vars(r)
 	idfilm := vars["idfilm"]

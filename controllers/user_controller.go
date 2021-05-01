@@ -51,7 +51,6 @@ func MemberRegistration(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		newIDUser := GetMD5Hash(email + namalengkap)
-		println("New id" + newIDUser + " pwd " + GetSHA256(password))
 		queryUser := "INSERT INTO user VALUES(?,?,?,?,?)  "
 		_, err = tx.ExecContext(ctx, queryUser, newIDUser, email, namalengkap, GetSHA256(password), 2)
 		if err != nil {

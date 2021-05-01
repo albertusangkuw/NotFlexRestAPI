@@ -87,7 +87,7 @@ func SearchCollectionFilm(w http.ResponseWriter, r *http.Request) {
 	query := "SELECT title, synopsis, mainactor, genre, director, releaseyear FROM film"
 	filterBY, valuesList := GenerateSQLWhere(r, []string{"title", "synopsis", "mainactor", "releaseyear", "genre", "director"}, "OR", "GET")
 	query += " WHERE " + filterBY
-	println(query)
+	//println(query)
 
 	resultSet, errQuery := DBConnection.Query(query, valuesList...)
 	var Film models.Film

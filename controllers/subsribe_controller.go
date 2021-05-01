@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -75,7 +76,7 @@ func AddSubscribe(w http.ResponseWriter, r *http.Request) {
 		awalberlangganan, err := time.Parse("2006-01-02 15:04:05", awaltanggalberlangganan)
 		akhirberlangganan := awalberlangganan.Add(30 * 24 * time.Hour)
 
-		token := GetSHA256(GetSHA256(iduser + tanggaltransaksi + passlockTokenSubsribe + jenislangganan + awaltanggalberlangganan))
+		token := GetSHA256(GetSHA256(iduser + "1" + tanggaltransaksi + passlockTokenSubsribe + jenislangganan + awaltanggalberlangganan))
 
 		query := "INSERT INTO subscribe(iduser,subscriptionstatus,transactiondate,subscriptiontype, startofsubscriptiondate, endofthesubscriptiondate,token) VALUES(?,?,?,?,?,?,?)  "
 		_, err = DBConnection.Exec(query, iduser, "1", tanggaltransaksi, jenislangganan, awaltanggalberlangganan, akhirberlangganan.Format("2006-01-02 15:04:05"), token)
@@ -146,8 +147,26 @@ func StopSubscribe(w http.ResponseWriter, r *http.Request) {
 	idUser := vars["iduser"]
 
 	if len(idLangganan) > 0 && len(idUser) > 0 {
-		query := "UPDATE subscribe SET subscriptionstatus=? WHERE 	idsubscription=? AND iduser=?"
-		_, errQuery := DBConnection.Exec(query, 0, idLangganan, idUser)
+		querySelect := "SELECT transactiondate,subscriptiontype,startofsubscriptiondate  FROM subscribe WHERE idsubscription=? AND iduser=?"
+		rows, errQuerySelect := DBConnection.Query(querySelect, idLangganan, idUser)
+		if errQuerySelect != nil {
+			ResponseManager(&response, 400, errQuerySelect.Error())
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+			return
+		}
+		var jenisLangganan string
+		var awaltanggalberlangganan string
+		var tanggaltransaksi string
+		for rows.Next() {
+			if err := rows.Scan(&tanggaltransaksi, &jenisLangganan, &awaltanggalberlangganan); err != nil {
+				log.Print(err.Error())
+			}
+		}
+		newtoken := GetSHA256(GetSHA256(idUser + "0" + tanggaltransaksi + passlockTokenSubsribe + jenisLangganan + awaltanggalberlangganan))
+
+		query := "UPDATE subscribe SET subscriptionstatus=?, token=? WHERE 	idsubscription=? AND iduser=?"
+		_, errQuery := DBConnection.Exec(query, 0, newtoken, idLangganan, idUser)
 		if errQuery != nil {
 			ResponseManager(&response, 400, errQuery.Error())
 		} else {
