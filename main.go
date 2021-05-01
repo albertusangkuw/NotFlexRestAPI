@@ -48,6 +48,17 @@ func main() {
 	})
 	handler := corsHandler.Handler(router)
 	http.Handle("/", handler)
+
+	fmt.Println("-----------------------------------------")
+	fmt.Println("              Tugas Kelompok             ")
+	fmt.Println("-----------------------------------------")
+	fmt.Println("1118050 Femi Elice")
+	fmt.Println("1119002 Albertus Septian Angkuw")
+	fmt.Println("1119008 Chritian Satya")
+	fmt.Println("1119038 Elangel Neilea Shaday")
+	fmt.Println("-----------------------------------------")
+	fmt.Println("Github Repository : https://github.com/albertusangkuw/NotFlexRestAPI ")
+	fmt.Println("-----------------------------------------")
 	fmt.Println("Connected to port 8085")
 	log.Fatal(http.ListenAndServe(":8085", router))
 }
