@@ -39,7 +39,7 @@ func AddFilm(w http.ResponseWriter, r *http.Request) {
 	tahunRilis := r.Form.Get("tahunrilis")
 
 	if len(judul) > 0 {
-		query := "INSERT INTO film(judul, sinopsis, pemainutama, genre, sutradara, tahunrilis) VALUES(?,?,?,?,?,?)"
+		query := "INSERT INTO film(title, synopsis, mainactor, genre, director, releaseyear) VALUES(?,?,?,?,?,?)"
 		_, errQuery := DBConnection.Exec(query, judul, sinopsis, pemainUtama, genre, sutradara, tahunRilis)
 
 		if errQuery != nil {
@@ -84,8 +84,8 @@ func SearchCollectionFilm(w http.ResponseWriter, r *http.Request) {
 	}
 	var response models.FilmResponse
 
-	query := "SELECT judul, sinopsis, pemainutama, genre, sutradara, tahunrilis FROM film"
-	filterBY, valuesList := GenerateSQLWhere(r, []string{"judul", "sinopsis", "pemainutama", "tahunrilis", "genre", "sutradara"}, "OR", "GET")
+	query := "SELECT title, synopsis, mainactor, genre, director, releaseyear FROM film"
+	filterBY, valuesList := GenerateSQLWhere(r, []string{"title", "synopsis", "mainactor", "releaseyear", "genre", "director"}, "OR", "GET")
 	query += " WHERE " + filterBY
 	println(query)
 
@@ -134,8 +134,8 @@ func SearchFilmDataBasedTitle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	judul := r.URL.Query()["judul"]
-	query := "SELECT judul, sinopsis, pemainutama, genre, sutradara, tahunrilis FROM film where judul = '" + judul[0] + "' "
+	title := r.URL.Query()["title"]
+	query := "SELECT title, synopsis, mainactor, genre, director, releaseyear FROM film where title = '" + title[0] + "' "
 	resultSet, errQuery := DBConnection.Query(query)
 	var film models.Film
 	var films []models.Film
@@ -181,7 +181,7 @@ func SearchFilmDataBasedId(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	idFilm := vars["idfilm"]
-	query := "SELECT judul, sinopsis, pemainutama, genre, sutradara, tahunrilis FROM film WHERE idfilm = " + idFilm + " "
+	query := "SELECT title, synopsis, mainactor, genre, director, releaseyear FROM film WHERE idfilm = " + idFilm + " "
 	resultSet, errQuery := DBConnection.Query(query)
 	if errQuery != nil {
 		var response models.Response
@@ -236,9 +236,10 @@ func UpdateDataFilm(w http.ResponseWriter, r *http.Request) {
 	idFilm := r.Form.Get("idFilm")
 
 	query := "UPDATE film SET "
-	filterBY, valuesList := GenerateSQLWhere(r, []string{"judul", "sinopsis", "pemainutama", "genre", "sutradara", "tahunrilis"}, ",", "GET")
+	filterBY, valuesList := GenerateSQLWhere(r, []string{"title", "synopsis", "mainactor", "releaseyear", "genre", "director"}, ",", "GET")
 	valuesList = append(valuesList, idFilm)
-	query += filterBY + " WHERE idfilm=?"
+	query = query + " " + filterBY + " WHERE idfilm=?"
+	println(query)
 	resultSet, err := DBConnection.Exec(query, valuesList...)
 
 	var response models.Response
@@ -285,7 +286,7 @@ func Watching(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idfilm := vars["idfilm"]
 	println(idfilm)
-	query := "SELECT judul, sinopsis, pemainutama, genre, sutradara, tahunrilis FROM film WHERE idfilm = ?"
+	query := "SELECT title, synopsis, mainactor, genre, director, releaseyear FROM film WHERE idfilm = ?"
 
 	if len(idfilm) == 0 {
 		var response models.Response

@@ -31,7 +31,7 @@ func SearchMemberBasedEmail(w http.ResponseWriter, r *http.Request) {
 	}
 	var response models.MemberResponse
 	email := r.URL.Query()["email"]
-	query := "SELECT u.iduser, u.email, u.namalengkap, u.password, u.tipe, m.jeniskelamin, m.asalnegara, m.status, m.tanggallahir FROM user u JOIN member m where u.email = '" + email[0] + "' "
+	query := "SELECT u.iduser, u.email, u.fullname, u.password, u.type, m.gender, m.countryoforigin, m.status, m.dateofbirth FROM user u JOIN member m where u.email = '" + email[0] + "' "
 	resultSet, errQuery := DBConnection.Query(query)
 	if errQuery != nil {
 		ResponseManager(&response.Response, 500, errQuery.Error())
@@ -65,7 +65,7 @@ func SearchMemberBasedEmail(w http.ResponseWriter, r *http.Request) {
 // Method : GET
 // Parameter :Path Param
 // Nilai Parameter Wajib : iduser
-func BlokirMember(w http.ResponseWriter, r *http.Request) {
+func BlockedMember(w http.ResponseWriter, r *http.Request) {
 	if !connect() {
 		var response models.Response
 		ResponseManager(&response, 500, " Database Server Not Responding")

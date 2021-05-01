@@ -35,8 +35,8 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	jeniskelamin := r.Form.Get("jeniskelamin")
 
 	if len(idUser) > 0 && len(namalengkap) > 0 && len(tanggallahir) > 0 && len(jeniskelamin) > 0 {
-		queryUser := "UPDATE user SET namalengkap=? WHERE iduser=?"
-		queryMember := "UPDATE member SET tanggalLahir=?, jenisKelamin=? WHERE iduser=?"
+		queryUser := "UPDATE user SET fullname=? WHERE iduser=?"
+		queryMember := "UPDATE member SET dateofbirth=?, gender=? WHERE iduser=?"
 		_, errQueryMember := DBConnection.Exec(queryMember, tanggallahir, jeniskelamin, idUser)
 		_, errQueryUser := DBConnection.Exec(queryUser, namalengkap, idUser)
 		if errQueryMember != nil && errQueryUser != nil {

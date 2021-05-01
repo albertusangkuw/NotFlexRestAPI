@@ -65,14 +65,19 @@ func AddSubscribe(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-
+	if !checkLuhn(nomorkartukredit) {
+		ResponseManager(&response, 400, " Not valid card number")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
 	if len(iduser) > 0 && len(tanggaltransaksi) > 0 && len(jenislangganan) > 0 && len(awaltanggalberlangganan) > 0 {
 		awalberlangganan, err := time.Parse("2006-01-02 15:04:05", awaltanggalberlangganan)
 		akhirberlangganan := awalberlangganan.Add(30 * 24 * time.Hour)
 
 		token := GetSHA256(GetSHA256(iduser + tanggaltransaksi + passlockTokenSubsribe + jenislangganan + awaltanggalberlangganan))
 
-		query := "INSERT INTO langganan(iduser,statuslangganan,tanggaltransaksi,jenislangganan,awaltanggalberlangganan,akhirtanggalberlangganan,token) VALUES(?,?,?,?,?,?,?)  "
+		query := "INSERT INTO subscribe(iduser,subscriptionstatus,transactiondate,subscriptiontype, startofsubscriptiondate, endofthesubscriptiondate,token) VALUES(?,?,?,?,?,?,?)  "
 		_, err = DBConnection.Exec(query, iduser, "1", tanggaltransaksi, jenislangganan, awaltanggalberlangganan, akhirberlangganan.Format("2006-01-02 15:04:05"), token)
 		if err != nil {
 			ResponseManager(&response, 500, err.Error())
@@ -91,10 +96,31 @@ func AddSubscribe(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//Algorithm from https://www.geeksforgeeks.org/luhn-algorithm/
+func checkLuhn(cardNo string) bool {
+	nDigits := len(cardNo)
+
+	nSum := 0
+	isSecond := false
+	for i := nDigits - 1; i >= 0; i-- {
+		var d int
+		d = int(cardNo[i] - '0')
+
+		if isSecond == true {
+			d = d * 2
+		}
+
+		nSum += d / 10
+		nSum += d % 10
+
+		isSecond = !isSecond
+	}
+	return (nSum%10 == 0)
+}
 
 // Elangel
-// StopSubscribe berfungsi untuk melakukan delete data langganan pada database agar user tidak berlangganan lagi
-// Method : DELETE
+// StopSubscribe berfungsi untuk melakukan update status data langganan pada database agar user tidak berlangganan lagi
+// Method : UPDATE
 // Parameter : Path Params
 // Nilai Parameter Wajib : iduser
 func StopSubscribe(w http.ResponseWriter, r *http.Request) {
@@ -120,15 +146,15 @@ func StopSubscribe(w http.ResponseWriter, r *http.Request) {
 	idUser := vars["iduser"]
 
 	if len(idLangganan) > 0 && len(idUser) > 0 {
-		query := "UPDATE langganan SET statuslangganan=? WHERE idlangganan=? AND iduser=?"
+		query := "UPDATE subscribe SET subscriptionstatus=? WHERE 	idsubscription=? AND iduser=?"
 		_, errQuery := DBConnection.Exec(query, 0, idLangganan, idUser)
 		if errQuery != nil {
 			ResponseManager(&response, 400, errQuery.Error())
 		} else {
-			ResponseManager(&response, 200, "Success Stop Langganan")
+			ResponseManager(&response, 200, "Success Stop Langganan ")
 		}
 	} else {
-		ResponseManager(&response, 400, "Error Stop Langganan")
+		ResponseManager(&response, 400, "Error Stop Langganan "+idLangganan)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

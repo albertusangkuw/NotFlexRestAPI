@@ -41,7 +41,6 @@ func MemberRegistration(w http.ResponseWriter, r *http.Request) {
 	asalnegara := r.Form.Get("asalnegara")
 
 	if len(email) > 0 && len(namalengkap) > 0 && len(password) > 7 && len(tanggallahir) > 0 && len(jeniskelamin) > 0 && len(asalnegara) > 0 {
-		// Starting transaction manager https://www.sohamkamani.com/golang/sql-transactions/
 		ctx := context.Background()
 		tx, err := DBConnection.BeginTx(ctx, nil)
 		if err != nil {
@@ -105,7 +104,7 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := "SELECT iduser,tipe FROM user WHERE email=? AND password=? "
+	query := "SELECT iduser,type FROM user WHERE email=? AND password=? "
 
 	email := r.URL.Query()["email"]
 	password := r.URL.Query()["password"]

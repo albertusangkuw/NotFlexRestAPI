@@ -22,7 +22,7 @@ func main() {
 	// Femi EndPoint
 	router.HandleFunc("/film/cari", controllers.Authenticate(controllers.SearchCollectionFilm, 0)).Methods("GET")
 	router.HandleFunc("/film/{idfilm}", controllers.Authenticate(controllers.Watching, 0)).Methods("GET")
-	router.HandleFunc("/administrator/member/suspend/{iduser}", controllers.Authenticate(controllers.BlokirMember, 1)).Methods("GET")
+	router.HandleFunc("/administrator/member/suspend/{iduser}", controllers.Authenticate(controllers.BlockedMember, 1)).Methods("GET")
 
 	//Elangel Endpoint
 	router.HandleFunc("/administrator/film/tambah", controllers.Authenticate(controllers.AddFilm, 1)).Methods("POST")

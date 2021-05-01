@@ -33,7 +33,7 @@ func AddCollection(w http.ResponseWriter, r *http.Request) {
 	namaKoleksi := r.Form.Get("namakoleksi")
 
 	if len(namaKoleksi) > 0 {
-		query := "INSERT INTO koleksi(namakoleksi) VALUES(?)"
+		query := "INSERT INTO collection(collectionname) VALUES(?)"
 		_, errQuery := DBConnection.Exec(query, namaKoleksi)
 
 		if errQuery != nil {
@@ -78,7 +78,7 @@ func AddFilmToCollection(w http.ResponseWriter, r *http.Request) {
 	idFilm := r.Form.Get("idfilm")
 
 	if len(idKoleksi) > 0 && len(idFilm) > 0 {
-		query := "INSERT INTO detailkoleksi(idkoleksi, idfilm) VALUES(?,?)"
+		query := "INSERT INTO collectiondetail(idcollection, idfilm) VALUES(?,?)"
 		_, errQuery := DBConnection.Exec(query, idKoleksi, idFilm)
 
 		if errQuery != nil {
@@ -128,7 +128,8 @@ func GetDetailCollection(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-	query := "SELECT dk.iddetailkoleksi, k.idkoleksi, k.namakoleksi, f.idfilm, f.judul, f.sinopsis, f.pemainutama, f.genre, f.sutradara, f.tahunrilis FROM detailkoleksi dk INNER JOIN koleksi k ON dk.idkoleksi = k.idkoleksi INNER JOIN film f ON dk.idfilm = f.idfilm WHERE dk.iddetailkoleksi = " + idDetailKoleksi[0]
+	query := "SELECT dk.iddetailcollection, k.idcollection, k.collectionname, f.idfilm, f.title, f.synopsis, f.mainactor, f.genre, f.director, f.releaseyear FROM collectiondetail dk INNER JOIN collection k ON dk.idcollection = k.idcollection INNER JOIN film f ON dk.idfilm = f.idfilm WHERE dk.iddetailcollection = " + idDetailKoleksi[0]
+	//quer?y := "SELECT dk.iddetailcollection, k.idcollection, k.collectionname, f.idfilm, f.title, f.synopsis, f.mainactor, f.genre, f.director, f.releaseyear FROM detailcollection dk INNER JOIN koleksi k ON dk.idcollection = k.idcollection INNER JOIN film f ON dk.idfilm = f.idfilm WHERE dk.iddetailcollection = " + idDetailKoleksi[0]
 	resultSet, errQuery := DBConnection.Query(query)
 	if errQuery != nil {
 		var response models.Response

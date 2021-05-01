@@ -38,7 +38,7 @@ func AddHistory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idfilm := vars["idfilm"]
 
-	query := "INSERT INTO history(iduser, tanggalakses, idfilm) VALUES(?,?,?)"
+	query := "INSERT INTO history(iduser, accessdate, idfilm) VALUES(?,?,?)"
 	_, errQuery := DBConnection.Exec(query, iduser, tanggalakses, idfilm)
 
 	if errQuery != nil {
@@ -79,7 +79,7 @@ func GetHistoryFilm(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-	query := "SELECT h.idhistory, f.idfilm, f.judul, f.sinopsis, f.genre, h.tanggalakses FROM history h JOIN film f ON h.idfilm = f.idfilm WHERE h.iduser =? "
+	query := "SELECT h.idhistory, f.idfilm, f.title, f.synopsis, f.genre, h.accessdate FROM history h JOIN film f ON h.idfilm = f.idfilm WHERE h.iduser =? "
 	resultSet, errQuery := DBConnection.Query(query, idUser)
 
 	var history models.History
